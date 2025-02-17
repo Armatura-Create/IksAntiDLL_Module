@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <DebugSymbols>False</DebugSymbols>
+        <DebugType>None</DebugType>
+        <PublishDir>./bin/IksAntiDLL/</PublishDir>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Включает копирование всех зависимостей -->
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>IksAntiDLL</RootNamespace>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Для всех конфигураций -->
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CounterStrikeSharp.API" Version="*">
+            <PrivateAssets>none</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+            <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Newtonsoft.Json" Version="*" />
+        <!-- Обеспечиваем копирование локальных DLL -->
+        <Reference Include="../RequirmentsApi/IksAdminApi.dll">
+            <Private>True</Private> <!-- DLL будет скопирована -->
+        </Reference>
+        <Reference Include="../RequirmentsApi/AntiDLL.API.dll">
+            <Private>True</Private> <!-- DLL будет скопирована -->
+        </Reference>
+    </ItemGroup>
+</Project>
