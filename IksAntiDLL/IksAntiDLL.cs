@@ -60,6 +60,8 @@ public class IksAntiDLL : AdminModule, IPluginConfig<PluginConfig>
 
         Task.Run(async () =>
         {
+            PlayersToDisconnect[steamId] = player;
+            
             await Task.Delay(TimeSpan.FromSeconds(5));
 
             Server.NextWorldUpdate(() =>
@@ -82,8 +84,6 @@ public class IksAntiDLL : AdminModule, IPluginConfig<PluginConfig>
                 {
                     Logger.LogInformation("[IksAntiDLL] Kicking player {0}, event - {1}", player.PlayerName, eventName);
                 }
-
-                PlayersToDisconnect[steamId] = player;
             });
         });
     }
