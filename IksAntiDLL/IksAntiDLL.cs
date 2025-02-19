@@ -61,7 +61,7 @@ public class IksAntiDLL : AdminModule, IPluginConfig<PluginConfig>
         Task.Run(async () =>
         {
             PlayersToDisconnect[steamId] = player;
-            
+
             await Task.Delay(TimeSpan.FromSeconds(5));
 
             Server.NextWorldUpdate(() =>
@@ -83,6 +83,7 @@ public class IksAntiDLL : AdminModule, IPluginConfig<PluginConfig>
                 else
                 {
                     Logger.LogInformation("[IksAntiDLL] Kicking player {0}, event - {1}", player.PlayerName, eventName);
+                    Api.Kick(Api.ConsoleAdmin, player, Config.Reason);
                 }
             });
         });
@@ -109,17 +110,24 @@ public class IksAntiDLL : AdminModule, IPluginConfig<PluginConfig>
         if (player is not { IsBot: false, IsValid: true } || player.AuthorizedSteamID == null)
             return HookResult.Continue;
 
-        PlayersToDisconnect.TryGetValue(player.AuthorizedSteamID.SteamId64, out var playerToDisconnect);
-
-        if (playerToDisconnect != null)
+        lock (LockObject)
         {
-            Task.Run(() =>
+            PlayersToDisconnect.TryGetValue(player.AuthorizedSteamID.SteamId64, out var playerToDisconnect);
+
+            if (playerToDisconnect != null)
             {
-                player.Disconnect(Config.Ban
-                    ? NetworkDisconnectionReason.NETWORK_DISCONNECT_STEAM_BANNED
-                    : NetworkDisconnectionReason.NETWORK_DISCONNECT_KICKED);
-                return Task.CompletedTask;
-            });
+                Task.Run(() =>
+                {
+                    Server.NextWorldUpdate(() =>
+                    {
+                        player.Disconnect(Config.Ban
+                            ? NetworkDisconnectionReason.NETWORK_DISCONNECT_STEAM_BANNED
+                            : NetworkDisconnectionReason.NETWORK_DISCONNECT_KICKED);
+                    });
+
+                    return Task.CompletedTask;
+                });
+            }
         }
 
         return HookResult.Continue;
